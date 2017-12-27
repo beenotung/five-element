@@ -1,0 +1,16 @@
+#!/bin/bash
+#elm-make --warn src/App.elm
+set -e
+res=$(elm-make --warn --report=json src/App.elm)
+line=$(echo "$res" | wc -l)
+if [ "$line" == "2" ]; then
+  # try to auto fix
+  json=$(echo "$res" | head -n 1)
+  echo "$json" | ./tools/insert-type.js >"$0.out" 2>"$0.err"
+  filename=$(cat "$0.err")
+  mv "$0.out" "$filename"
+  rm "$0.err"
+  $0 $@
+else
+  echo "$res"
+fi
