@@ -112,6 +112,16 @@ colors =
     ]
 
 
+textColor : String -> String
+textColor backgroundColor =
+    case backgroundColor of
+        "black" ->
+            "white"
+
+        _ ->
+            "black"
+
+
 elementColor : ElementType -> String
 elementColor element =
     List.filterMap
@@ -163,8 +173,25 @@ viewElement element =
     let
         color =
             elementColor element.elementType
+
+        fontSize =
+            element.r * 35 / 60
     in
-        Svg.circle [ Svg.Attributes.cx (toString element.cx), Svg.Attributes.cy (toString element.cy), Svg.Attributes.r (toString element.r), fill color ] []
+        Svg.g [ Svg.Attributes.transform ("translate(" ++ (toString element.cx) ++ "," ++ (toString element.cy) ++ ")") ]
+            [ Svg.circle
+                [ Svg.Attributes.r (toString element.r)
+                , fill color
+                ]
+                []
+            , Svg.text_
+                [ x (toString (-element.r / 2))
+                , y (toString ((element.r - fontSize) / 2))
+                , fontFamily "Verdana"
+                , Svg.Attributes.fontSize (toString fontSize)
+                , fill (textColor color)
+                ]
+                [ Html.text (toString element.amount) ]
+            ]
 
 
 update : a -> Model -> ( Model, Cmd msg )
