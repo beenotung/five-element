@@ -38,6 +38,30 @@ colors =
     ]
 
 
+elementColor : ElementType -> String
+elementColor element =
+    List.filterMap
+        (\x ->
+            let
+                ( e, c ) =
+                    x
+            in
+                if e == element then
+                    Just c
+                else
+                    Nothing
+        )
+        colors
+        |> List.head
+        |> \x ->
+            case x of
+                Nothing ->
+                    Debug.crash "Invalid ElementType"
+
+                Just x ->
+                    x
+
+
 viewMain : Html.Html msg
 viewMain =
     let
@@ -47,22 +71,41 @@ viewMain =
         r =
             60
 
+        right =
+            r
+
+        left =
+            size - r
+
+        top =
+            r
+
+        bottom =
+            size - r
+
+        center =
+            (left + right) / 2
+
         sizeStr =
             toString size
     in
         svg
             [ version "1.1", x "0", y "0", viewBox ("0 0 " ++ sizeStr ++ " " ++ sizeStr) ]
-            [ viewElement "red" "60" "60" r
-            , viewElement "gold" "100" "100" r
-            , viewElement "burlywood" "200" "200" r
-            , viewElement "burlywood" "200" "200" r
-            , viewElement "burlywood" "200" "200" r
+            [ viewElement Fire right top r
+            , viewElement Gold right bottom r
+            , viewElement Wood left top r
+            , viewElement Water left bottom r
+            , viewElement Soil center center r
             ]
 
 
-viewElement : String -> String -> String -> a -> Svg.Svg msg
-viewElement color cx cy r =
-    Svg.circle [ Svg.Attributes.cx cx, Svg.Attributes.cy cy, Svg.Attributes.r (toString r), fill color ] []
+viewElement : ElementType -> number -> number -> number -> Svg.Svg msg
+viewElement element cx cy r =
+    let
+        color =
+            elementColor element
+    in
+        Svg.circle [ Svg.Attributes.cx (toString cx), Svg.Attributes.cy (toString cy), Svg.Attributes.r (toString r), fill color ] []
 
 
 update : a -> b -> ( b, Cmd msg )
