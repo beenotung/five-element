@@ -1,0 +1,24 @@
+#!/bin/bash
+#elm-make --warn src/App.elm
+res=$(elm-make --warn --report=json src/App.elm)
+line=$(echo "$res" | wc -l)
+if [ "$line" == "2" ]; then
+  # try to auto fix
+  json=$(echo "$res" | head -n 1)
+  if [ "$TEST" == "true" ]; then
+    echo "$json" | tools/fix.js
+    exit
+  fi
+  echo "$json" | tools/fix.js >"$0.out" 2>"$0.err"
+  if [ $? != 0 ]; then
+    cat "$0.err" >&2
+    rm "$0.err"
+    exit 1
+  fi
+  filename=$(cat "$0.err")
+  mv "$0.out" "$filename"
+  rm "$0.err"
+  $0 $@
+else
+  echo "$res"
+fi

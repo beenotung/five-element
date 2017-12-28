@@ -1,5 +1,4 @@
 {
-    "name":"five-element",
     "version": "0.0.0",
     "summary": "illustration of five elements interaction",
     "repository": "https://github.com/beenotung/five-element.git",
@@ -10,7 +9,8 @@
     "exposed-modules": [],
     "dependencies": {
         "elm-lang/core": "5.1.1 <= v < 6.0.0",
-        "elm-lang/html": "2.0.0 <= v < 3.0.0"
+        "elm-lang/html": "2.0.0 <= v < 3.0.0",
+        "elm-lang/svg": "2.0.0 <= v < 3.0.0"
     },
     "elm-version": "0.18.0 <= v < 0.19.0"
 }

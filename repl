@@ -1,0 +1,2 @@
+#!/bin/bash
+elm-repl -c `type -p elm-make`
