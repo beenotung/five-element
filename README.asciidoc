@@ -1,0 +1,10 @@
+= Five Element
+
+image::https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/Wuxing_2.svg/2000px-Wuxing_2.svg.png[Diagram]
+
+The Fire should be at top,
+Water at bottom,
+Wood at left,
+Metal at right.
+
+Using 45 def rotated layout for better screen utilize.

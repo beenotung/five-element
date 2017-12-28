@@ -6,17 +6,91 @@ import Svg exposing (svg)
 import Svg.Attributes exposing (..)
 
 
-init : ( number, Cmd msg )
+type alias Model =
+    List Element
+
+
+type alias Element =
+    { elementType : ElementType
+    , amount : Float
+    , cx : Float
+    , cy : Float
+    , r : Float
+    }
+
+
+positions :
+    { bottom : Float
+    , center : Float
+    , left : Float
+    , padding : Float
+    , r : Float
+    , right : Float
+    , size : Float
+    , top : Float
+    }
+positions =
+    let
+        padding =
+            4
+
+        size =
+            320
+
+        r =
+            60
+
+        right =
+            r + padding
+
+        left =
+            size - r - padding
+
+        top =
+            r + padding
+
+        bottom =
+            size - r - padding
+
+        center =
+            (left + right) / 2
+    in
+        { padding = padding
+        , size = size
+        , r = r
+        , right = right
+        , left = left
+        , top = top
+        , bottom = bottom
+        , center = center
+        }
+
+
+initModel : List Element
+initModel =
+    let
+        p =
+            positions
+    in
+        [ Element Fire 100 p.right p.top p.r
+        , Element Wood 100 p.right p.bottom p.r
+        , Element Gold 100 p.left p.top p.r
+        , Element Water 100 p.left p.bottom p.r
+        , Element Soil 100 p.center p.center p.r
+        ]
+
+
+init : ( Model, Cmd msg )
 init =
-    1 ! []
+    initModel ! []
 
 
-view : a -> Html.Html msg
+view : Model -> Html.Html msg
 view model =
     Html.div
         [ Html.Attributes.style [ ( "margin", "8px" ) ] ]
         [ Html.h1 [] [ Html.text "Five Elements" ]
-        , viewMain
+        , viewMain model
         ]
 
 
@@ -31,10 +105,10 @@ type ElementType
 colors : List ( ElementType, String )
 colors =
     [ ( Fire, "red" )
-    , ( Gold, "gold" )
-    , ( Wood, "burlywood" )
-    , ( Water, "darkturquoise" )
-    , ( Soil, "sienna" )
+    , ( Gold, "white" )
+    , ( Wood, "greenyellow" )
+    , ( Water, "black" )
+    , ( Soil, "yellow" )
     ]
 
 
@@ -62,53 +136,38 @@ elementColor element =
                     x
 
 
-viewMain : Html.Html msg
-viewMain =
+viewMain : Model -> Html.Html msg
+viewMain model =
     let
-        size =
-            320
-
-        r =
-            60
-
-        right =
-            r
-
-        left =
-            size - r
-
-        top =
-            r
-
-        bottom =
-            size - r
-
-        center =
-            (left + right) / 2
+        p =
+            positions
 
         sizeStr =
-            toString size
+            toString p.size
     in
         svg
-            [ version "1.1", x "0", y "0", viewBox ("0 0 " ++ sizeStr ++ " " ++ sizeStr) ]
-            [ viewElement Fire right top r
-            , viewElement Gold right bottom r
-            , viewElement Wood left top r
-            , viewElement Water left bottom r
-            , viewElement Soil center center r
+            [ version "1.1"
+            , x "0"
+            , y "0"
+            , viewBox ("0 0 " ++ sizeStr ++ " " ++ sizeStr)
+            , Html.Attributes.style
+                [ ( "background", "tan" )
+                , ( "padding", (toString p.padding) ++ "px" )
+                ]
             ]
+            (List.map viewElement model)
 
 
-viewElement : ElementType -> number -> number -> number -> Svg.Svg msg
-viewElement element cx cy r =
+viewElement : Element -> Html.Html msg
+viewElement element =
     let
         color =
-            elementColor element
+            elementColor element.elementType
     in
-        Svg.circle [ Svg.Attributes.cx (toString cx), Svg.Attributes.cy (toString cy), Svg.Attributes.r (toString r), fill color ] []
+        Svg.circle [ Svg.Attributes.cx (toString element.cx), Svg.Attributes.cy (toString element.cy), Svg.Attributes.r (toString element.r), fill color ] []
 
 
-update : a -> b -> ( b, Cmd msg )
+update : a -> Model -> ( Model, Cmd msg )
 update msg model =
     model ! []
 
@@ -118,7 +177,7 @@ subscriptions model =
     Sub.none
 
 
-main : Program Never number msg
+main : Program Never Model msg
 main =
     Html.program
         { init = init
