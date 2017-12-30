@@ -1,0 +1,4 @@
+#!/bin/bash
+set -e
+elm-format --yes src/RandomTest.elm
+elm-make --warn --debug src/RandomTest.elm

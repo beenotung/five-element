@@ -1,2 +1,2 @@
 #!/bin/bash
-./format && ./build
+./format && ./build --warn --debug

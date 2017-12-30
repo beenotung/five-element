@@ -1,5 +1,7 @@
 module Main exposing (main)
 
+import FormatNumber
+import FormatNumber.Locales
 import Html
 import Html.Attributes
 import Random
@@ -192,8 +194,34 @@ viewElement element =
                 , Svg.Attributes.fontSize (toString fontSize)
                 , fill (textColor color)
                 ]
-                [ Html.text (toString element.amount) ]
+                [ Html.text (formatFloat element.amount) ]
             ]
+
+
+formatFloat : Float -> String
+formatFloat x =
+    let
+        y =
+            x |> round |> toFloat
+
+        diff =
+            abs (y - x)
+
+        d =
+            if x >= 100 then
+                0
+            else if x >= 10 then
+                1
+            else
+                2
+
+        s =
+            FormatNumber.format (FormatNumber.Locales.Locale d "," "." "-" "") x
+    in
+        if String.length s > 0 then
+            s
+        else
+            toString x
 
 
 type Msg
@@ -207,21 +235,36 @@ type ActionType
     | Rest
 
 
+type UpdatePart
+    = UpdatePart ElementType Float
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Tick time ->
-            ( model, generateAction )
+            let
+                r =
+                    Debug.log "tick" time
+            in
+                ( model, generateAction )
 
         Action ( actionType, elementType ) ->
             let
-                r =
-                    Debug.log "update action" ( actionType, elementType )
+                updateParts =
+                    updateAction actionType elementType model
 
-                m =
-                    List.map (\x -> updateElement actionType elementType model x) model
+                r =
+                    Debug.log "update action"
+                        ({ action = ( actionType, elementType )
+                         , change = updateParts
+                         }
+                        )
+
+                newModel =
+                    reduceUpdates updateParts model
             in
-                ( m, Cmd.none )
+                ( newModel, Cmd.none )
 
 
 generateAction : Cmd Msg
@@ -279,30 +322,69 @@ generateElementType =
             )
 
 
-updateElement : ActionType -> ElementType -> Model -> Element -> Element
-updateElement actionType elementType model self =
-    if self.elementType == elementType then
-        let
-            downElement =
-                downElementType self.elementType
-                    |> flip lookupElement model
+updateAction : ActionType -> ElementType -> Model -> List UpdatePart
+updateAction actionType selfElementType model =
+    let
+        self =
+            lookupElement selfElementType model
+    in
+        case actionType of
+            Attack ->
+                let
+                    targetElementType =
+                        downElementType selfElementType
 
-            upElement =
-                upElementType self.elementType
-                    |> flip lookupElement model
+                    target =
+                        lookupElement targetElementType model
 
-            inc =
-                upElement.amount * 0.1
+                    delta =
+                        -- self.amount * 0.1
+                        self.amount * 0.1 * (self.amount / target.amount)
+                in
+                    [ UpdatePart targetElementType -delta ]
 
-            dec =
-                downElement.amount * 0.1
+            Recover ->
+                let
+                    targetElementType =
+                        upElementType selfElementType
 
-            newAmount =
-                self.amount + inc - dec
-        in
-            { self | amount = newAmount }
-    else
-        self
+                    target =
+                        lookupElement targetElementType model
+
+                    delta =
+                        -- target.amount * 0.1
+                        target.amount * 0.1 * (target.amount / self.amount)
+                in
+                    [ UpdatePart selfElementType delta ]
+
+            Rest ->
+                let
+                    delta =
+                        self.amount * 0.1
+                in
+                    [ UpdatePart selfElementType delta ]
+
+
+reduceUpdates : List UpdatePart -> Model -> Model
+reduceUpdates parts model =
+    List.foldl
+        (\part model ->
+            case part of
+                UpdatePart elementType delta ->
+                    let
+                        element =
+                            lookupElement elementType model
+
+                        newAmount =
+                            Basics.max 0.01 (element.amount + delta)
+
+                        newElement =
+                            { element | amount = newAmount }
+                    in
+                        updateElement newElement model
+        )
+        model
+        parts
 
 
 downElementType : ElementType -> ElementType
@@ -363,9 +445,21 @@ lookupElement elementType model =
                     x
 
 
+updateElement : Element -> Model -> Model
+updateElement element model =
+    List.map
+        (\x ->
+            if x.elementType == element.elementType then
+                element
+            else
+                x
+        )
+        model
+
+
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Time.every Time.second Tick
+    Time.every (Time.millisecond * 20) Tick
 
 
 main : Program Never Model Msg
