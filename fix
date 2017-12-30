@@ -4,6 +4,7 @@ if [ $# == 1 ]; then
 else
   src="src/App.elm"
 fi
+echo '' >> "$src"
 res=$(elm-make --warn --report=json "$src")
 line=$(echo "$res" | wc -l)
 if [ "$line" == "2" ]; then
