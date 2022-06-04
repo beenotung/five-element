@@ -5,6 +5,40 @@ let G = 1
 let B = 2
 let A = 3
 
+let WATER = 1
+let FIRE = 2
+let WOOD = 3
+let GOLD = 4
+let SOIL = 5
+
+let rs: number[] = []
+let gs: number[] = []
+let bs: number[] = []
+
+rs[0] = 221
+gs[0] = 221
+bs[0] = 255
+
+rs[WATER] = 127
+gs[WATER] = 127
+bs[WATER] = 127
+
+rs[FIRE] = 255
+gs[FIRE] = 127
+bs[FIRE] = 127
+
+rs[WOOD] = 127
+gs[WOOD] = 255
+bs[WOOD] = 255
+
+rs[GOLD] = 255
+gs[GOLD] = 255
+bs[GOLD] = 255
+
+rs[SOIL] = 255
+gs[SOIL] = 255
+bs[SOIL] = 127
+
 function findElement<E extends HTMLElement>(selector: string): E {
   let e = document.querySelector<E>(selector)
   if (!e) throw new Error('Could not find element, selector: ' + selector)
@@ -29,6 +63,9 @@ function resize() {
   canvas.height = h
   imageData = context.getImageData(0, 0, w, h)
   for (let i = 0; i < imageData.data.length; i += 4) {
+    imageData.data[i + R] = rs[0]
+    imageData.data[i + G] = gs[0]
+    imageData.data[i + B] = bs[0]
     imageData.data[i + A] = 255
   }
 }
@@ -40,9 +77,10 @@ function draw() {
   let x = floor(random() * w)
   let y = floor(random() * h)
   let i = (y * w + x) * 4
-  let r = floor(random() * 256)
-  let g = floor(random() * 256)
-  let b = floor(random() * 256)
+  let e = floor(random() * 5) + 1
+  let r = rs[e]
+  let g = gs[e]
+  let b = bs[e]
   imageData.data[i + R] = r
   imageData.data[i + G] = g
   imageData.data[i + B] = b
