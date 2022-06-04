@@ -1,0 +1,32 @@
+{
+  "name": "five-element",
+  "version": "1.0.0",
+  "description": "A pixel simulation of \"five element\" (五行)",
+  "keywords": [],
+  "author": {
+    "name": "Beeno Tung",
+    "email": "aabbcc1241@yahoo.com.hk",
+    "url": "https://beeno-tung.surge.sh"
+  },
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/beenotung/five-element.git"
+  },
+  "homepage": "https://github.com/beenotung/five-element#readme",
+  "bugs": {
+    "url": "https://github.com/beenotung/five-element/issues"
+  },
+  "scripts": {
+    "start": "snowpack dev --port 8100",
+    "test": "tsc --noEmit",
+    "build": "tsc -p ."
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.38",
+    "snowpack": "^3.8.8",
+    "ts-node": "^10.8.0",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^4.7.2"
+  }
+}
