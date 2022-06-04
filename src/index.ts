@@ -15,19 +15,19 @@ let rs: number[] = []
 let gs: number[] = []
 let bs: number[] = []
 
-rs[0] = 221
-gs[0] = 221
-bs[0] = 255
+rs[0] = 190
+gs[0] = 190
+bs[0] = 190
 
-rs[WATER] = 127
-gs[WATER] = 127
-bs[WATER] = 127
+rs[WATER] = 0
+gs[WATER] = 0
+bs[WATER] = 0
 
 rs[FIRE] = 255
-gs[FIRE] = 127
-bs[FIRE] = 127
+gs[FIRE] = 63
+bs[FIRE] = 0
 
-rs[WOOD] = 127
+rs[WOOD] = 0
 gs[WOOD] = 255
 bs[WOOD] = 255
 
@@ -36,8 +36,8 @@ gs[GOLD] = 255
 bs[GOLD] = 255
 
 rs[SOIL] = 255
-gs[SOIL] = 255
-bs[SOIL] = 127
+gs[SOIL] = 190
+bs[SOIL] = 0
 
 function findElement<E extends HTMLElement>(selector: string): E {
   let e = document.querySelector<E>(selector)
