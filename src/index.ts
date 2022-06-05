@@ -83,13 +83,14 @@ for (let e = 1; e <= 5; e++) {
 
 function resize() {
   let rect = canvas.getBoundingClientRect()
+  let oldW = w
+  let oldH = h
   w = floor(rect.width / PIXEL)
   h = floor(rect.height / PIXEL)
-  let oldN = n
   n = w * h
   for (let i = 0; i < elementCount; i++) {
-    elementXs[i] = floor((elementXs[i] / oldN) * n)
-    elementYs[i] = floor((elementYs[i] / oldN) * n)
+    elementXs[i] = floor((elementXs[i] / oldW) * w)
+    elementYs[i] = floor((elementYs[i] / oldH) * h)
   }
   for (let e = 1; e <= 5; e++) {
     forces[e].length = n
