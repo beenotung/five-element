@@ -76,8 +76,10 @@ let elementYs: number[] = []
 let elements: number[] = []
 let elementCount = 0
 
+let constantForces: number[][] = []
 let forces: number[][] = []
 for (let e = 1; e <= 5; e++) {
+  constantForces[e] = []
   forces[e] = []
 }
 
@@ -93,6 +95,8 @@ function resize() {
     elementYs[i] = floor((elementYs[i] / oldH) * h)
   }
   for (let e = 1; e <= 5; e++) {
+    constantForces[e].length = n
+    constantForces[e].fill(0)
     forces[e].length = n
     forces[e].fill(0)
   }
@@ -128,14 +132,14 @@ window.addEventListener('mousedown', event => {
   isMouseDown = true
   let x = floor(event.clientX / PIXEL)
   let y = floor(event.clientY / PIXEL)
-  let e = floor(random() * 5) + 1
+  let e = mode === 0 ? floor(random() * 5) + 1 : mode
   place(x, y, e)
 })
 window.addEventListener('mousemove', event => {
   if (!isMouseDown) return
   let x = floor(event.clientX / PIXEL)
   let y = floor(event.clientY / PIXEL)
-  let e = floor(random() * 5) + 1
+  let e = mode == 0 ? floor(random() * 5) + 1 : mode
   place(x, y, e)
 })
 window.addEventListener('mouseup', event => {
@@ -149,14 +153,25 @@ let ForceFactor = 1
 let batch = 100_000
 
 function initForceField() {
+  for (let e = 1; e <= 5; e++) {
+    constantForces[e].fill(0)
+  }
   for (let idx = 0; idx < elementCount; idx++) {
     let x = elementXs[idx]
     let y = elementYs[idx]
     let e = elements[idx]
     let i = floor(y) * w + floor(x)
-    forces[grows[e]][i] = 1
-    forces[attacks[e]][i] = -1
-    forces[e][i] = 0.5
+
+    let g = grows[e]
+    let a = attacks[e]
+
+    constantForces[g][i] = 1
+    constantForces[a][i] = -1
+    // constantForces[e][i] = 0.5
+
+    forces[g][i] = 1
+    forces[a][i] = -1
+    // forces[e][i] = 0.5
   }
 }
 
@@ -166,8 +181,7 @@ function calcForceField() {
     let y = floor(random() * h)
     let x = floor(random() * w)
     let i = y * w + x
-    let value = forces[e][i]
-    if (value === 1 || value === -1) {
+    if (constantForces[e][i] !== 0) {
       continue
     }
     let sum = 0
@@ -182,6 +196,7 @@ function calcForceField() {
       let i = y * w + x
       sum += forces[e][i]
     })
+    let value = forces[e][i]
     let avg = sum / 4.0
     let correction = avg - value
     forces[e][i] += correction * OverCorrectionFactor
@@ -210,21 +225,27 @@ function moveElementInForceField() {
     let y = elementYs[idx]
     let x = elementXs[idx]
     let i = floor(y) * w + floor(x)
+    let f = forces[e][i]
+    let c = constantForces[e][i]
     let upI = y - 1 < 0 ? i + w : i - w
     let leftI = x - 1 < 0 ? i + 1 : i - 1
-    let dy = forces[e][i] - forces[e][upI]
-    let dx = forces[e][i] - forces[e][leftI]
+    let dy = f - forces[e][upI]
+    let dx = f - forces[e][leftI]
     x += dx * ForceFactor
     x = x < 0 ? -x : x >= w ? (w << 1) - x : x
     y += dy * ForceFactor
     y = y < 0 ? -y : y >= h ? (h << 1) - y : y
     elementXs[idx] = x
     elementYs[idx] = y
-    i = (floor(y) * w + floor(x)) * 4
-    imageData.data[i + R] = rs[e]
-    imageData.data[i + G] = gs[e]
-    imageData.data[i + B] = bs[e]
-    imageData.data[i + A] = 255
+    let newI = floor(y) * w + floor(x)
+    if (newI !== i) {
+      forces[e][i] = 0
+    }
+    newI *= 4
+    imageData.data[newI + R] = rs[e]
+    imageData.data[newI + G] = gs[e]
+    imageData.data[newI + B] = bs[e]
+    imageData.data[newI + A] = 255
   }
 }
 
