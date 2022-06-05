@@ -20,11 +20,13 @@
   "scripts": {
     "start": "snowpack dev --port 8100",
     "test": "tsc --noEmit",
-    "build": "tsc -p ."
+    "upload": "surge build https://five-element.surge.sh",
+    "build": "snowpack build"
   },
   "devDependencies": {
     "@types/node": "^17.0.38",
     "snowpack": "^3.8.8",
+    "surge": "^0.23.1",
     "ts-node": "^10.8.0",
     "ts-node-dev": "^2.0.0",
     "typescript": "^4.7.2"
