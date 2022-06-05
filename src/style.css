@@ -2,7 +2,7 @@ body {
   margin: 0;
 }
 canvas#world {
-  background-color: #ddd;
+  background-color: #bebebe;
   width: 100vw;
   height: 100vh;
   image-rendering: pixelated;
