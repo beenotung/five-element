@@ -147,7 +147,7 @@ let ForceFactor = 1
 
 let batch = 100_000
 
-function draw() {
+function initForceField() {
   for (let idx = 0; idx < elementCount; idx++) {
     let x = elementXs[idx]
     let y = elementYs[idx]
@@ -157,6 +157,9 @@ function draw() {
     forces[attacks[e]][i] = -1
     forces[e][i] = 0.5
   }
+}
+
+function calcForceField() {
   for (let b = 0; b < batch; b++) {
     let e = floor(random() * 5) + 1
     let y = floor(random() * h)
@@ -182,7 +185,9 @@ function draw() {
     let correction = avg - value
     forces[e][i] += correction * OverCorrectionFactor
   }
+}
 
+function drawForceField() {
   if (mode === 0) {
     imageData.data.fill(0)
   } else {
@@ -196,6 +201,9 @@ function draw() {
       imageData.data[offset + A] = 255
     }
   }
+}
+
+function moveElementInForceField() {
   for (let idx = 0; idx < elementCount; idx++) {
     let e = elements[idx]
     let y = elementYs[idx]
@@ -217,7 +225,13 @@ function draw() {
     imageData.data[i + B] = bs[e]
     imageData.data[i + A] = 255
   }
+}
 
+function draw() {
+  initForceField()
+  calcForceField()
+  drawForceField()
+  moveElementInForceField()
   context.putImageData(imageData, 0, 0)
   requestAnimationFrame(draw)
 }
