@@ -226,11 +226,8 @@ function moveElementInForceField() {
     let x = elementXs[idx]
     let i = floor(y) * w + floor(x)
     let f = forces[e][i]
-    let c = constantForces[e][i]
-    let upI = y - 1 < 0 ? i + w : i - w
-    let leftI = x - 1 < 0 ? i + 1 : i - 1
-    let dy = f - forces[e][upI]
-    let dx = f - forces[e][leftI]
+    let dy = i >= w ? f - forces[e][i - w] : f - forces[e][i + w] - f
+    let dx = i >= 1 ? f - forces[e][i - 1] : forces[e][i + 1] - f
     x += dx * ForceFactor
     x = x < 0 ? -x : x >= w ? (w << 1) - x : x
     y += dy * ForceFactor
